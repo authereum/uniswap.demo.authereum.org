@@ -11,7 +11,7 @@ import { shortenAddress } from '../../utils'
 import { useENSName } from '../../hooks'
 import WalletModal from '../WalletModal'
 import { useAllTransactions } from '../../contexts/Transactions'
-import { Spinner } from '../../theme'
+import { Spinner, Link } from '../../theme'
 import Circle from '../../assets/images/circle.svg'
 
 const { Connector } = Connectors
@@ -30,6 +30,18 @@ const Web3StatusGeneric = styled.button`
     outline: none;
   }
 `
+
+const ConnectContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+const LogoutText = styled.div`
+  display: flex;
+  justify-content: center;
+  padding-top: 5px;
+  font-size: 0.4rem;
+`
+
 const Web3StatusError = styled(Web3StatusGeneric)`
   background-color: ${({ theme }) => theme.salmonRed};
   color: ${({ theme }) => theme.white};
@@ -228,6 +240,10 @@ export default function Web3Status() {
     }
   }
 
+  function handleLogout() {
+    window.ethereum.authereum.logout()
+  }
+
   const ref = useRef()
   useEffect(() => {
     if (ref.current) {
@@ -256,11 +272,20 @@ export default function Web3Status() {
       )
     } else {
       return (
-        <Web3StatusConnected onClick={onClick} pending={hasPendingTransactions}>
-          {hasPendingTransactions && <SpinnerWrapper src={Circle} alt="loader" />}
-          <Text>{ENSName || shortenAddress(account)}</Text>
-          <Identicon ref={ref} />
-        </Web3StatusConnected>
+        <ConnectContainer>
+          <Web3StatusConnected onClick={onClick} pending={hasPendingTransactions}>
+            {hasPendingTransactions && <SpinnerWrapper src={Circle} alt="loader" />}
+            <Text>{ENSName || shortenAddress(account)}</Text>
+            <Identicon ref={ref} />
+          </Web3StatusConnected>
+          <LogoutText>
+            <Link
+              onClick={handleLogout}
+            >
+              Click to log out
+            </Link>
+          </LogoutText>
+        </ConnectContainer>
       )
     }
   }

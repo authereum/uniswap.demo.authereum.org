@@ -1,5 +1,33 @@
 import { Connectors } from 'web3-react'
+import { injectWeb3 } from 'authereum'
 const { Connector, ErrorCodeMixin } = Connectors
+
+const network = process.env.REACT_APP_NETWORK
+let enabled = false
+
+const checkWeb3 = () => {
+  if (window.ethereum && window.ethereum.isAuthereum) {
+    // NOTE: set timeout to override MetaMask
+    setTimeout(() => {
+      clearInterval(interval)
+    }, 1e2)
+  } else {
+    // NOTE: temp fix to prevent redirect on mobile upon first load
+    setTimeout(() => {
+      enabled = true
+    }, 2e3)
+
+    injectWeb3(network)
+
+    // TODO: better way to check if there's a login key
+    if (localStorage.getItem('@authereum:authKeySignature')) {
+      window.ethereum.enable()
+    }
+  }
+}
+
+let interval = setInterval(() => checkWeb3(), 1e3)
+checkWeb3()
 
 const InjectedConnectorErrorCodes = ['ETHEREUM_ACCESS_DENIED', 'NO_WEB3', 'UNLOCK_REQUIRED']
 export default class InjectedConnector extends ErrorCodeMixin(Connector, InjectedConnectorErrorCodes) {
@@ -19,7 +47,7 @@ export default class InjectedConnector extends ErrorCodeMixin(Connector, Injecte
   async onActivation() {
     const { ethereum, web3 } = window
 
-    if (ethereum) {
+    if (ethereum && enabled) {
       await ethereum.enable().catch(error => {
         const deniedAccessError = Error(error)
         deniedAccessError.code = InjectedConnector.errorCodes.ETHEREUM_ACCESS_DENIED

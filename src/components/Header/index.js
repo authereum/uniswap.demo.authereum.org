@@ -11,6 +11,10 @@ const HeaderElement = styled.div`
   min-width: 0;
 `
 
+const TitleContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`
 const Title = styled.div`
   display: flex;
   align-items: center;
@@ -35,6 +39,14 @@ const Title = styled.div`
   }
 `
 
+const Subtitle = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: 0.5rem;
+  color: ${({ theme }) => theme.wisteriaPurple};
+  justify-content: flex-end;
+`
+
 export default function Header() {
   return (
     <>
@@ -44,9 +56,14 @@ export default function Header() {
             🦄
           </span>
 
-          <Link id="link" href="https://uniswap.io">
-            <h1 id="title">Uniswap</h1>
-          </Link>
+          <TitleContainer>
+            <Link id="link" href="https://uniswap.io">
+              <h1 id="title">Uniswap</h1>
+            </Link>
+            <Subtitle>
+              KOVAN
+            </Subtitle>
+          </TitleContainer>
         </Title>
       </HeaderElement>
 

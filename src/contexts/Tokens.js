@@ -28,6 +28,50 @@ const ETH = {
 }
 
 const INITIAL_TOKENS_CONTEXT = {
+  42: {
+    '0xac94ea989f6955c67200dd67f0101e1865a560ea': {
+      [NAME]: 'Maker',
+      [SYMBOL]: 'MKR',
+      [DECIMALS]: 18,
+      [EXCHANGE_ADDRESS]: '0xc64f00b099649d578bf289894d3a51ee7d0b04e5'
+    },
+    '0xc4375b7de8af5a38a93548eb8453a498222c4ff2': {
+      [NAME]: 'Dai Stablecoin v1.0',
+      [SYMBOL]: 'DAI',
+      [DECIMALS]: 18,
+      [EXCHANGE_ADDRESS]: '0x47d4af3bbaec0de4dba5f44ae8ed2761977d32d6'
+    },
+    '0x02f96ef85cad6639500ca1cc8356f0b5ca5bf1d2': {
+      [NAME]: 'Basic Attention Token',
+      [SYMBOL]: 'BAT',
+      [DECIMALS]: 18,
+      [EXCHANGE_ADDRESS]: '0x2f177704b7ceb1fa56c8956479f321b56ad9e3b4'
+    },
+    // '0x3fa9fcd9456991fe1220d1bb77a5863695c01c05': {
+    //   [NAME]: 'Omise Go',
+    //   [SYMBOL]: 'OMG',
+    //   [DECIMALS]: 18,
+    //   [EXCHANGE_ADDRESS]: '0x2f177704b7ceb1fa56c8956479f321b56ad9e3b4'
+    // },
+    // '0x4c7493b70f16bec1e087bf74a31d095f9b8f9c40': {
+    //   [NAME]: 'Reputation',
+    //   [SYMBOL]: 'REP',
+    //   [DECIMALS]: 18,
+    //   [EXCHANGE_ADDRESS]: '0x4ca9baaffcc2692db2b33ab2ab2edda86c2c4a4d'
+    // },
+    '0xf8720eb6ad4a530cccb696043a0d10831e2ff60e': {
+      [NAME]: 'Civic',
+      [SYMBOL]: 'CVC',
+      [DECIMALS]: 18,
+      [EXCHANGE_ADDRESS]: '0x0ca5508612ca567dcb9caf02abc7f894fd4b7d82'
+    },
+    '0x4bb57bc8485ec4c4112aa25da4e746f373ad540e': {
+      [NAME]: 'Golem Network Token',
+      [SYMBOL]: 'GNT',
+      [DECIMALS]: 18,
+      [EXCHANGE_ADDRESS]: '0x7ca1bec492374463705103dda25cb1c41dcf8caa'
+    },
+  },
   1: {
     '0x960b236A07cf122663c4303350609A66A7B288C0': {
       [NAME]: 'Aragon Network Token',
@@ -89,14 +133,12 @@ const INITIAL_TOKENS_CONTEXT = {
       [DECIMALS]: 9,
       [EXCHANGE_ADDRESS]: '0xb92dE8B30584392Af27726D5ce04Ef3c4e5c9924'
     },
-
     '0xc719d010B63E5bbF2C0551872CD5316ED26AcD83': {
       [NAME]: 'Decentralized Insurance Protocol',
       [SYMBOL]: 'DIP',
       [DECIMALS]: 18,
       [EXCHANGE_ADDRESS]: '0x61792F290e5100FBBcBb2309F03A1Bab869fb850'
     },
-
     '0x4946Fcea7C692606e8908002e55A582af44AC121': {
       [NAME]: 'FOAM Token',
       [SYMBOL]: 'FOAM',

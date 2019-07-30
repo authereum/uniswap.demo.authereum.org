@@ -5,7 +5,7 @@ import { useWeb3Context } from 'web3-react'
 import { ethers } from 'ethers'
 import styled from 'styled-components'
 
-import { Button } from '../../theme'
+import { Button, Link } from '../../theme'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
 import NewContextualInfo from '../../components/ContextualInfoNew'
 import OversizedPanel from '../../components/OversizedPanel'
@@ -79,6 +79,11 @@ const Flex = styled.div`
   button {
     max-width: 20rem;
   }
+`
+
+const AuthereumLinkContainer = styled.div`
+  display: flex;
+  justify-content: center;
 `
 
 function calculateSlippageBounds(value, token = false) {
@@ -748,6 +753,25 @@ export default function Swap({ initialCurrency }) {
         <Button disabled={!isValid} onClick={onSwap} warning={highSlippageWarning}>
           {highSlippageWarning ? t('swapAnyway') : t('swap')}
         </Button>
+      </Flex>
+      <AuthereumLinkContainer>
+        <Link
+          href={`https://kovan.accounts.authereum.org`}
+          style={{
+            maxWidth: '250px',
+            fontSize: '12px'
+          }}
+        >
+          Click here to go to your Authereum account
+        </Link> 
+      </AuthereumLinkContainer>
+      <Flex
+        style={{
+          fontSize: '8px',
+          color: 'gray'
+        }}
+      >
+        Note: You are on the Kovan test network. The ETH and tokens on this page are on the Kovan network and do not have any value.
       </Flex>
     </>
   )

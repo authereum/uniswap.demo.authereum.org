@@ -1,5 +1,11 @@
 # Uniswap Frontend
 
+---
+
+## Note: This is a fork of the Uniswap frontend, hosted by Authereum and running on the Kovan Network. The ETH and tokens traded on this site have no value.
+
+---
+
 [![Netlify Status](https://api.netlify.com/api/v1/badges/fa110555-b3c7-4eeb-b840-88a835009c62/deploy-status)](https://app.netlify.com/sites/uniswap/deploys)
 [![Build Status](https://travis-ci.org/Uniswap/uniswap-frontend.svg)](https://travis-ci.org/Uniswap/uniswap-frontend)
 [![Styled With Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
