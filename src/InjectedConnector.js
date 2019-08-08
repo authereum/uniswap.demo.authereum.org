@@ -17,7 +17,7 @@ const checkWeb3 = () => {
       enabled = true
     }, 2e3)
 
-    injectWeb3(network)
+    injectWeb3(network, false)
 
     // TODO: better way to check if there's a login key
     if (localStorage.getItem('@authereum:authKeySignature')) {
@@ -39,6 +39,7 @@ export default class InjectedConnector extends ErrorCodeMixin(Connector, Injecte
     this.accountsChangedHandler = this.accountsChangedHandler.bind(this)
 
     const { ethereum } = window
+    console.log("ETHEREUM = ", ethereum)
     if (ethereum && ethereum.isMetaMask) {
       ethereum.autoRefreshOnNetworkChange = false
     }
