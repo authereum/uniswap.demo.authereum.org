@@ -5,7 +5,7 @@ const { Connector, ErrorCodeMixin } = Connectors
 const network = process.env.REACT_APP_NETWORK
 let enabled = false
 
-const checkWeb3 = () => {
+const checkWeb3 = async () => {
   if (window.ethereum && window.ethereum.isAuthereum) {
     // NOTE: set timeout to override MetaMask
     setTimeout(() => {
@@ -19,8 +19,7 @@ const checkWeb3 = () => {
 
     injectWeb3(network, false)
 
-    // TODO: better way to check if there's a login key
-    if (localStorage.getItem('@authereum:authKeySignature')) {
+    if (window.ethereum && window.ethereum.authereum && await window.ethereum.authereum.isAuthenticated()) {
       window.ethereum.enable()
     }
   }
