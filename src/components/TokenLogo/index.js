@@ -48,7 +48,6 @@ export default function TokenLogo({ address, size = '1rem', ...rest }) {
   if (address === 'ETH') {
     return <StyledEthereumLogo size={size} />
   } else if (!error && !BAD_IMAGES[address]) {
-    console.log('in')
     path = kovanIcons[address]
   } else {
     return (
