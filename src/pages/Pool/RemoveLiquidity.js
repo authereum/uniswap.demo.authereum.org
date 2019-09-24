@@ -245,12 +245,13 @@ export default function RemoveLiquidity() {
 
     const deadline = Math.ceil(Date.now() / 1000) + DEADLINE_FROM_NOW
 
-    const estimatedGasLimit = await exchange.estimate.removeLiquidity(
-      valueParsed,
-      ethWithdrawnMin,
-      tokenWithdrawnMin,
-      deadline
-    )
+    // const estimatedGasLimit = await exchange.estimate.removeLiquidity(
+    //   valueParsed,
+    //   ethWithdrawnMin,
+    //   tokenWithdrawnMin,
+    //   deadline
+    // )
+    const estimatedGasLimit = ethers.utils.bigNumberify(250000)
 
     exchange
       .removeLiquidity(valueParsed, ethWithdrawnMin, tokenWithdrawnMin, deadline, {
