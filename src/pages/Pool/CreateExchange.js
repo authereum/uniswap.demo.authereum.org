@@ -100,7 +100,8 @@ function CreateExchange({ history, location }) {
   }, [tokenAddress.address, symbol, decimals, exchangeAddress, account, t, tokenAddressError])
 
   async function createExchange() {
-    const estimatedGasLimit = await factory.estimate.createExchange(tokenAddress.address)
+    // const estimatedGasLimit = await factory.estimate.createExchange(tokenAddress.address)
+    const estimatedGasLimit = ethers.utils.bigNumberify(1000000)
 
     factory.createExchange(tokenAddress.address, { gasLimit: estimatedGasLimit }).then(response => {
       ReactGA.event({
