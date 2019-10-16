@@ -617,8 +617,9 @@ export default function ExchangePage({ initialCurrency, sending = false, params 
     }
 
     // const estimatedGasLimit = await estimate(...args, { value })
-    const estimatedGasLimit = ethers.utils.bigNumberify(250000)
-    method(...args, { value, gasLimit: calculateGasMargin(estimatedGasLimit, GAS_MARGIN) }).then(response => {
+    // const estimatedGasLimit = ethers.utils.bigNumberify(250000)
+    // method(...args, { value, gasLimit: calculateGasMargin(estimatedGasLimit, GAS_MARGIN) }).then(response => {
+    method(...args, { value }).then(response => {
       addTransaction(response)
     })
   }
