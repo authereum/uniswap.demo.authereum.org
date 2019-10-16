@@ -36,7 +36,7 @@
   "scripts": {
     "start": "REACT_APP_NETWORK=localhost react-scripts --max-old-space-size=4096 start",
     "build": "npm run build:mainnet",
-    "build:mainnet": "REACT_APP_NETWORK=kovan react-scripts --max-old-space-size=4096 build ",
+    "build:mainnet": "react-scripts --max-old-space-size=4096 build ",
     "build:kovan": "REACT_APP_NETWORK=kovan react-scripts --max-old-space-size=4096 build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
