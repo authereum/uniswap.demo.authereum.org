@@ -18,7 +18,8 @@
   "unlock": "Unlock",
   "pending": "Pending",
   "selectToken": "Select a token",
-  "searchOrPaste": "Search Token or Paste Address",
+  "searchOrPaste": "Search Token Name, Symbol, or Address",
+  "searchOrPasteMobile": "Name, Symbol, or Address",
   "noExchange": "No Exchange Found",
   "exchangeRate": "Exchange Rate",
   "unknownError": "Oops! An unknown error occurred. Please refresh the page, or visit from another browser or device.",
@@ -27,7 +28,7 @@
   "noLiquidity": "No liquidity.",
   "insufficientLiquidity": "Insufficient liquidity.",
   "unlockTokenCont": "Please unlock token to continue.",
-  "transactionDetails": "Transaction Details",
+  "transactionDetails": "Advanced Details",
   "hideDetails": "Hide Details",
   "slippageWarning": "Slippage Warning",
   "highSlippageWarning": "High Slippage Warning",
@@ -36,6 +37,7 @@
   "youWillReceive": "You will receive at least",
   "youAreBuying": "You are buying",
   "itWillCost": "It will cost at most",
+  "forAtMost": "for at most",
   "insufficientBalance": "Insufficient Balance",
   "inputNotValid": "Not a valid input value",
   "differentToken": "Must be different token.",
@@ -80,5 +82,6 @@
   "symbol": "Symbol",
   "decimals": "Decimals",
   "enterTokenCont": "Enter a token address to continue",
-  "priceChange": "This trade will cause the price to change by"
+  "priceChange": "Expected price slippage",
+  "forAtLeast": "for at least "
 }

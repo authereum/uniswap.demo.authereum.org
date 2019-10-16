@@ -1,5 +1,5 @@
 import styled, { keyframes } from 'styled-components'
-import { lighten, darken } from 'polished'
+import { darken } from 'polished'
 
 export const Button = styled.button.attrs(({ warning, theme }) => ({
   backgroundColor: warning ? theme.salmonRed : theme.royalBlue
@@ -13,20 +13,20 @@ export const Button = styled.button.attrs(({ warning, theme }) => ({
   outline: none;
   background-color: ${({ backgroundColor }) => backgroundColor};
   color: ${({ theme }) => theme.white};
-  transition: background-color 125ms ease-in-out;
   width: 100%;
 
   :hover,
   :focus {
-    background-color: ${({ backgroundColor }) => lighten(0.05, backgroundColor)};
-  }
-
-  :active {
     background-color: ${({ backgroundColor }) => darken(0.05, backgroundColor)};
   }
 
+  :active {
+    background-color: ${({ backgroundColor }) => darken(0.1, backgroundColor)};
+  }
+
   :disabled {
-    background-color: ${({ theme }) => theme.mercuryGray};
+    background-color: ${({ theme }) => theme.concreteGray};
+    color: ${({ theme }) => theme.silverGray};
     cursor: auto;
   }
 `
@@ -50,12 +50,13 @@ export const Link = styled.a.attrs({
 `
 
 export const BorderlessInput = styled.input`
-  color: ${({ theme }) => theme.mineshaftGray};
+  color: ${({ theme }) => theme.textColor};
   font-size: 1rem;
   outline: none;
   border: none;
   flex: 1 1 auto;
   width: 0;
+  background-color: ${({ theme }) => theme.inputBackground};
 
   [type='number'] {
     -moz-appearance: textfield;
@@ -67,7 +68,7 @@ export const BorderlessInput = styled.input`
   }
 
   ::placeholder {
-    color: ${({ theme }) => theme.mercuryGray};
+    color: ${({ theme }) => theme.chaliceGray};
   }
 `
 
