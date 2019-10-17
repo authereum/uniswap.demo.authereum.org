@@ -1,6 +1,7 @@
 import React, { useReducer, useState, useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useWeb3Context } from 'web3-react'
+import { createBrowserHistory } from 'history'
 import { ethers } from 'ethers'
 import ReactGA from 'react-ga'
 import styled from 'styled-components'
@@ -9,12 +10,13 @@ import { Button } from '../../theme'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
 import OversizedPanel from '../../components/OversizedPanel'
 import ContextualInfo from '../../components/ContextualInfo'
-import PlusBlue from '../../assets/images/plus-blue.svg'
-import PlusGrey from '../../assets/images/plus-grey.svg'
+import { ReactComponent as Plus } from '../../assets/images/plus-blue.svg'
+
 import { useExchangeContract } from '../../hooks'
 import { amountFormatter, calculateGasMargin } from '../../utils'
 import { useTransactionAdder } from '../../contexts/Transactions'
 import { useTokenDetails } from '../../contexts/Tokens'
+import { useFetchAllBalances } from '../../contexts/AllBalances'
 import { useAddressBalance, useExchangeReserves } from '../../contexts/Balances'
 import { useAddressAllowance } from '../../contexts/Allowances'
 
@@ -63,14 +65,6 @@ const DownArrowBackground = styled.div`
   justify-content: center;
   align-items: center;
 `
-
-const DownArrow = styled.img`
-  width: 0.625rem;
-  height: 0.625rem;
-  position: relative;
-  padding: 0.875rem;
-`
-
 const SummaryPanel = styled.div`
   ${({ theme }) => theme.flexColumnNoWrap}
   padding: 1rem 0;
@@ -87,7 +81,7 @@ const ExchangeRateWrapper = styled.div`
 const ExchangeRate = styled.span`
   flex: 1 1 auto;
   width: 0;
-  color: ${({ theme }) => theme.chaliceGray};
+  color: ${({ theme }) => theme.doveGray};
 `
 
 const Flex = styled.div`
@@ -97,6 +91,17 @@ const Flex = styled.div`
 
   button {
     max-width: 20rem;
+  }
+`
+
+const WrappedPlus = ({ isError, highSlippageWarning, ...rest }) => <Plus {...rest} />
+const ColoredWrappedPlus = styled(WrappedPlus)`
+  width: 0.625rem;
+  height: 0.625rem;
+  position: relative;
+  padding: 0.875rem;
+  path {
+    stroke: ${({ active, theme }) => (active ? theme.royalBlue : theme.chaliceGray)};
   }
 `
 
@@ -114,11 +119,19 @@ function calculateSlippageBounds(value) {
   }
 }
 
-const initialAddLiquidityState = {
-  inputValue: '',
-  outputValue: '',
-  lastEditedField: INPUT,
-  outputCurrency: ''
+function calculateMaxOutputVal(value) {
+  if (value) {
+    return value.mul(ethers.utils.bigNumberify(10000)).div(ALLOWED_SLIPPAGE.add(ethers.utils.bigNumberify(10000)))
+  }
+}
+
+function initialAddLiquidityState(state) {
+  return {
+    inputValue: state.ethAmountURL ? state.ethAmountURL : '',
+    outputValue: state.tokenAmountURL && !state.ethAmountURL ? state.tokenAmountURL : '',
+    lastEditedField: state.tokenAmountURL && state.ethAmountURL === '' ? OUTPUT : INPUT,
+    outputCurrency: state.tokenURL ? state.tokenURL : ''
+  }
 }
 
 function addLiquidityStateReducer(state, action) {
@@ -149,7 +162,7 @@ function addLiquidityStateReducer(state, action) {
       }
     }
     default: {
-      return initialAddLiquidityState
+      return initialAddLiquidityState()
     }
   }
 }
@@ -185,11 +198,21 @@ function getMarketRate(reserveETH, reserveToken, decimals, invert = false) {
   return getExchangeRate(reserveETH, 18, reserveToken, decimals, invert)
 }
 
-export default function AddLiquidity() {
+export default function AddLiquidity({ params }) {
   const { t } = useTranslation()
   const { library, active, account } = useWeb3Context()
 
-  const [addLiquidityState, dispatchAddLiquidityState] = useReducer(addLiquidityStateReducer, initialAddLiquidityState)
+  // clear url of query
+  useEffect(() => {
+    const history = createBrowserHistory()
+    history.push(window.location.pathname + '')
+  }, [])
+
+  const [addLiquidityState, dispatchAddLiquidityState] = useReducer(
+    addLiquidityStateReducer,
+    { ethAmountURL: params.ethAmount, tokenAmountURL: params.tokenAmount, tokenURL: params.token },
+    initialAddLiquidityState
+  )
   const { inputValue, outputValue, lastEditedField, outputCurrency } = addLiquidityState
   const inputCurrency = 'ETH'
 
@@ -362,6 +385,7 @@ export default function AddLiquidity() {
     })
 
     const deadline = Math.ceil(Date.now() / 1000) + DEADLINE_FROM_NOW
+
     // const estimatedGasLimit = await exchangeContract.estimate.addLiquidity(
     //   isNewExchange ? ethers.constants.Zero : liquidityTokensMin,
     //   isNewExchange ? outputValueParsed : outputValueMax,
@@ -372,6 +396,8 @@ export default function AddLiquidity() {
     // )
     const estimatedGasLimit = ethers.utils.bigNumberify(250000)
 
+    const gasLimit = calculateGasMargin(estimatedGasLimit, GAS_MARGIN)
+
     exchangeContract
       .addLiquidity(
         isNewExchange ? ethers.constants.Zero : liquidityTokensMin,
@@ -379,7 +405,7 @@ export default function AddLiquidity() {
         deadline,
         {
           value: inputValueParsed,
-          gasLimit: calculateGasMargin(estimatedGasLimit, GAS_MARGIN)
+          gasLimit
         }
       )
       .then(response => {
@@ -529,6 +555,8 @@ export default function AddLiquidity() {
   const isActive = active && account
   const isValid = (inputError === null || outputError === null) && !showUnlock
 
+  const allBalances = useFetchAllBalances()
+
   return (
     <>
       {isNewExchange ? (
@@ -545,9 +573,21 @@ export default function AddLiquidity() {
 
       <CurrencyInputPanel
         title={t('deposit')}
+        allBalances={allBalances}
         extraText={inputBalance && formatBalance(amountFormatter(inputBalance, 18, 4))}
         onValueChange={inputValue => {
           dispatchAddLiquidityState({ type: 'UPDATE_VALUE', payload: { value: inputValue, field: INPUT } })
+        }}
+        extraTextClickHander={() => {
+          if (inputBalance) {
+            const valueToSet = inputBalance.sub(ethers.utils.parseEther('.1'))
+            if (valueToSet.gt(ethers.constants.Zero)) {
+              dispatchAddLiquidityState({
+                type: 'UPDATE_VALUE',
+                payload: { value: amountFormatter(valueToSet, 18, 18, false), field: INPUT }
+              })
+            }
+          }
         }}
         selectedTokenAddress="ETH"
         value={inputValue}
@@ -556,11 +596,12 @@ export default function AddLiquidity() {
       />
       <OversizedPanel>
         <DownArrowBackground>
-          <DownArrow src={isActive ? PlusBlue : PlusGrey} alt="plus" />
+          <ColoredWrappedPlus active={isActive} alt="plus" />
         </DownArrowBackground>
       </OversizedPanel>
       <CurrencyInputPanel
         title={t('deposit')}
+        allBalances={allBalances}
         description={isNewExchange ? '' : outputValue ? `(${t('estimated')})` : ''}
         extraText={outputBalance && formatBalance(amountFormatter(outputBalance, decimals, Math.min(decimals, 4)))}
         selectedTokenAddress={outputCurrency}
@@ -569,6 +610,17 @@ export default function AddLiquidity() {
         }}
         onValueChange={outputValue => {
           dispatchAddLiquidityState({ type: 'UPDATE_VALUE', payload: { value: outputValue, field: OUTPUT } })
+        }}
+        extraTextClickHander={() => {
+          if (outputBalance) {
+            dispatchAddLiquidityState({
+              type: 'UPDATE_VALUE',
+              payload: {
+                value: amountFormatter(calculateMaxOutputVal(outputBalance), decimals, decimals, false),
+                field: OUTPUT
+              }
+            })
+          }
         }}
         value={outputValue}
         showUnlock={showUnlock}
