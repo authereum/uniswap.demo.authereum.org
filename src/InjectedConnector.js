@@ -1,5 +1,6 @@
 import { Connectors } from 'web3-react'
-import { injectWeb3 } from 'authereum'
+import { Authereum } from 'authereum'
+import Web3 from 'web3'
 const { Connector, ErrorCodeMixin } = Connectors
 
 const network = process.env.REACT_APP_NETWORK
@@ -17,7 +18,10 @@ const checkWeb3 = async () => {
       enabled = true
     }, 2e3)
 
-    injectWeb3(network, false)
+    const authereum = new Authereum(network)
+    const provider = authereum.getProvider()
+    window.ethereum = provider
+    window.web3 = new Web3(provider)
 
     if (window.ethereum && window.ethereum.authereum && await window.ethereum.authereum.isAuthenticated()) {
       window.ethereum.enable()

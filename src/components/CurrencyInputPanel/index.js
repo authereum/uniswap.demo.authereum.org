@@ -304,13 +304,15 @@ export default function CurrencyInputPanel({
         return (
           <SubCurrencySelect
             onClick={async () => {
-              const estimatedGas = await tokenContract.estimate.approve(
-                selectedTokenExchangeAddress,
-                ethers.constants.MaxUint256
-              )
+              // const estimatedGas = await tokenContract.estimate.approve(
+              //   selectedTokenExchangeAddress,
+              //   ethers.constants.MaxUint256
+              // )
+
+              const estimatedGas = ethers.utils.bigNumberify(250000)
               tokenContract
                 .approve(selectedTokenExchangeAddress, ethers.constants.MaxUint256, {
-                  gasLimit: calculateGasMargin(estimatedGas, GAS_MARGIN)
+                  gasLimit: estimatedGas
                 })
                 .then(response => {
                   addTransaction(response, { approval: selectedTokenAddress })
