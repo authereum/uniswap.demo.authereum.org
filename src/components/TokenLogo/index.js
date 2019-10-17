@@ -39,7 +39,7 @@ export default function TokenLogo({ address, size = '1rem', ...rest }) {
     return (
       <Emoji {...rest} size={size}>
         <span role="img" aria-label="Thinking">
-            {'🤔'}
+          🤔
         </span>
       </Emoji>
     )
