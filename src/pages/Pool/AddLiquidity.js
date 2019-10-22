@@ -370,7 +370,7 @@ export default function AddLiquidity() {
     //     value: inputValueParsed
     //   }
     // )
-    const estimatedGasLimit = ethers.utils.bigNumberify(250000)
+    const estimatedGasLimit = ethers.utils.bigNumberify(500000)
 
     exchangeContract
       .addLiquidity(

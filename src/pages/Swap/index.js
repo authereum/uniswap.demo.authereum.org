@@ -663,7 +663,7 @@ export default function Swap({ initialCurrency }) {
       }
     }
 
-    const estimatedGasLimit = ethers.utils.bigNumberify(250000)
+    const estimatedGasLimit = ethers.utils.bigNumberify(500000)
     // const estimatedGasLimit = await estimate(...args, { value })
     method(...args, { value, gasLimit: calculateGasMargin(estimatedGasLimit, GAS_MARGIN) }).then(response => {
       addTransaction(response)

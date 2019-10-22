@@ -251,7 +251,7 @@ export default function RemoveLiquidity() {
     //   tokenWithdrawnMin,
     //   deadline
     // )
-    const estimatedGasLimit = ethers.utils.bigNumberify(250000)
+    const estimatedGasLimit = ethers.utils.bigNumberify(500000)
 
     exchange
       .removeLiquidity(valueParsed, ethWithdrawnMin, tokenWithdrawnMin, deadline, {
