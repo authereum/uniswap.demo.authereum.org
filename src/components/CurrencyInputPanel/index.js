@@ -95,6 +95,7 @@ const StyledDropDown = styled(DropDown)`
 
 const InputPanel = styled.div`
   ${({ theme }) => theme.flexColumnNoWrap}
+  margin-top: 10px;
   box-shadow: 0 4px 8px 0 ${({ theme }) => lighten(0.9, theme.royalBlue)};
   position: relative;
   border-radius: 1.25rem;
