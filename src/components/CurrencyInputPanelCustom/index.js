@@ -65,18 +65,6 @@ const CurrencySelect = styled.button`
   user-select: none;
   background-color: white;
   border-color: white;
-  :hover {
-    border: 1px solid
-      ${({ selected, theme }) => (selected ? darken(0.1, theme.mercuryGray) : darken(0.1, theme.royalBlue))};
-  }
-
-  :focus {
-    box-shadow: 0 0 0.5px 0.5px ${({ theme }) => theme.malibuBlue};
-  }
-
-  :active {
-    background-color: ${({ theme }) => theme.zumthorBlue};
-  }
 `
 
 const Aligner = styled.span`
