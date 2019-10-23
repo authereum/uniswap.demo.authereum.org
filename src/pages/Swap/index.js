@@ -700,7 +700,7 @@ export default function Swap({ initialCurrency }) {
         errorMessage={inputError ? inputError : independentField === INPUT ? independentError : ''}
       />
       <OversizedPanel>
-        <DownArrowBackground>
+        {/* <DownArrowBackground>
           <DownArrow
             onClick={() => {
               dispatchSwapState({ type: 'FLIP_INDEPENDENT' })
@@ -709,7 +709,7 @@ export default function Swap({ initialCurrency }) {
             alt="swap"
             src={isValid ? ArrowDownBlue : ArrowDownGrey}
           />
-        </DownArrowBackground>
+        </DownArrowBackground> */}
       </OversizedPanel>
       <CurrencyInputPanel
         title={t('output')}
