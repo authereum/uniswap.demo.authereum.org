@@ -7,6 +7,7 @@ import styled from 'styled-components'
 
 import { Button, Link } from '../../theme'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
+import CurrencyInputPanelCustom from '../../components/CurrencyInputPanelCustom'
 import NewContextualInfo from '../../components/ContextualInfoNew'
 import OversizedPanel from '../../components/OversizedPanel'
 import ArrowDownBlue from '../../assets/images/arrow-down-blue.svg'
@@ -677,7 +678,7 @@ export default function Swap({ initialCurrency }) {
 
   return (
     <>
-      <CurrencyInputPanel
+      <CurrencyInputPanelCustom
         title={t('input')}
         description={inputValueFormatted && independentField === OUTPUT ? estimatedText : ''}
         extraText={inputBalanceFormatted && formatBalance(inputBalanceFormatted)}
