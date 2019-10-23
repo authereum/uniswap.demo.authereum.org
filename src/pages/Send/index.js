@@ -657,13 +657,9 @@ export default function Swap({ initialCurrency }) {
       })
 
       if (swapType === ETH_TO_TOKEN) {
-        // estimate = contract.estimate.ethToTokenTransferOutput
-        // method = contract.ethToTokenTransferOutput
-        // args = [independentValueParsed, deadline, recipient.address]
-        // value = dependentValueMaximum
-        estimate = contract.estimate.ethToTokenTransferInput
-        method = contract.ethToTokenTransferInput
-        args = [0, deadline, recipient.address]
+        estimate = contract.estimate.ethToTokenTransferOutput
+        method = contract.ethToTokenTransferOutput
+        args = [independentValueParsed, deadline, recipient.address]
         value = dependentValueMaximum
       } else if (swapType === TOKEN_TO_ETH) {
         estimate = contract.estimate.tokenToEthTransferOutput

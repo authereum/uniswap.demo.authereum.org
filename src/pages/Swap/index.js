@@ -646,8 +646,13 @@ export default function Swap({ initialCurrency }) {
       })
 
       if (swapType === ETH_TO_TOKEN) {
-        estimate = contract.estimate.ethToTokenSwapOutput
-        method = contract.ethToTokenSwapOutput
+        // estimate = contract.estimate.ethToTokenSwapOutput
+        // method = contract.ethToTokenSwapOutput
+        // args = [independentValueParsed, deadline]
+        // value = dependentValueMaximum
+
+        estimate = contract.estimate.ethToTokenSwapInput
+        method = contract.ethToTokenSwapInput
         args = [independentValueParsed, deadline]
         value = dependentValueMaximum
       } else if (swapType === TOKEN_TO_ETH) {
@@ -700,16 +705,16 @@ export default function Swap({ initialCurrency }) {
         errorMessage={inputError ? inputError : independentField === INPUT ? independentError : ''}
       />
       <OversizedPanel>
-        {/* <DownArrowBackground>
-          <DownArrow
+        <DownArrowBackground>
+          {/* <DownArrow
             onClick={() => {
               dispatchSwapState({ type: 'FLIP_INDEPENDENT' })
             }}
             clickable
             alt="swap"
             src={isValid ? ArrowDownBlue : ArrowDownGrey}
-          />
-        </DownArrowBackground> */}
+          /> */}
+        </DownArrowBackground>
       </OversizedPanel>
       <CurrencyInputPanel
         title={t('output')}
