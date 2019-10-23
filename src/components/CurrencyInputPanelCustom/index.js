@@ -277,13 +277,13 @@ export default function CurrencyInputPanelCustom({
           value={value}
         />
         {renderUnlockButton()}
-        {/* <CurrencySelect
+        <CurrencySelect
           selected={!!selectedTokenAddress}
-          onClick={() => {
-            if (!disableTokenSelect) {
-              setModalIsOpen(true)
-            }
-          }}
+          // onClick={() => {
+          //   if (!disableTokenSelect) {
+          //     setModalIsOpen(true)
+          //   }
+          // }}
         >
           <Aligner>
             {selectedTokenAddress ? <TokenLogo address={selectedTokenAddress} /> : null}
@@ -294,7 +294,7 @@ export default function CurrencyInputPanelCustom({
             }
             {!disableTokenSelect && <StyledDropDown selected={!!selectedTokenAddress} />}
           </Aligner>
-        </CurrencySelect> */}
+        </CurrencySelect>
       </InputRow>
     )
   }
