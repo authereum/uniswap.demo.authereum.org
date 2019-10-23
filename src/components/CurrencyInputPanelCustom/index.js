@@ -61,9 +61,10 @@ const CurrencySelect = styled.button`
   border-radius: 2.5rem;
   background-color: ${({ selected, theme }) => (selected ? theme.concreteGray : theme.zumthorBlue)};
   outline: none;
-  cursor: pointer;
+  cursor: default;
   user-select: none;
-
+  background-color: white;
+  border-color: white;
   :hover {
     border: 1px solid
       ${({ selected, theme }) => (selected ? darken(0.1, theme.mercuryGray) : darken(0.1, theme.royalBlue))};
@@ -86,7 +87,7 @@ const Aligner = styled.span`
 
 const StyledDropDown = styled(DropDown)`
   margin: 0 0.5rem 0 0.5rem;
-  height: 35%;
+  height: 0;
 
   path {
     stroke: ${({ selected, theme }) => (selected ? theme.black : theme.royalBlue)};
