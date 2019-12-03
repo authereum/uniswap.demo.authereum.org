@@ -20,6 +20,7 @@ import TokenLogo from '../TokenLogo'
 import SearchIcon from '../../assets/images/magnifying-glass.svg'
 import { useTransactionAdder, usePendingApproval } from '../../contexts/Transactions'
 import { useTokenDetails, useAllTokenDetails } from '../../contexts/Tokens'
+import { useAddressBalance } from '../../contexts/Balances'
 import { ReactComponent as Close } from '../../assets/images/x.svg'
 import { transparentize } from 'polished'
 import { Spinner } from '../../theme'
@@ -296,6 +297,10 @@ export default function CurrencyInputPanel({
 
   const allTokens = useAllTokenDetails()
 
+  const { account } = useWeb3Context()
+
+  const userTokenBalance = useAddressBalance(account, selectedTokenAddress)
+
   function renderUnlockButton() {
     if (disableUnlock || !showUnlock || selectedTokenAddress === 'ETH' || !selectedTokenAddress) {
       return null
@@ -308,12 +313,28 @@ export default function CurrencyInputPanel({
               //   selectedTokenExchangeAddress,
               //   ethers.constants.MaxUint256
               // )
-
-              const estimatedGas = ethers.utils.bigNumberify(250000)
-              tokenContract
+              let estimatedGas
+              let useUserBalance = false
+              estimatedGas = await tokenContract.estimate
                 .approve(selectedTokenExchangeAddress, ethers.constants.MaxUint256, {
                   gasLimit: estimatedGas
                 })
+                .catch(e => {
+                  console.log('Error setting max token approval.')
+                })
+              if (!estimatedGas) {
+                // general fallback for tokens who restrict approval amounts
+                estimatedGas = await tokenContract.estimate.approve(selectedTokenExchangeAddress, userTokenBalance)
+                useUserBalance = true
+              }
+              tokenContract
+                .approve(
+                  selectedTokenExchangeAddress,
+                  useUserBalance ? userTokenBalance : ethers.constants.MaxUint256,
+                  {
+                    gasLimit: calculateGasMargin(estimatedGas, GAS_MARGIN)
+                  }
+                )
                 .then(response => {
                   addTransaction(response, { approval: selectedTokenAddress })
                 })

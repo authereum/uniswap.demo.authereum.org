@@ -13,6 +13,7 @@ import ContextualInfo from '../../components/ContextualInfo'
 import { ReactComponent as Plus } from '../../assets/images/plus-blue.svg'
 
 import { useExchangeContract } from '../../hooks'
+import { brokenTokens } from '../../constants'
 import { amountFormatter, calculateGasMargin } from '../../utils'
 import { useTransactionAdder } from '../../contexts/Transactions'
 import { useTokenDetails } from '../../contexts/Tokens'
@@ -221,6 +222,8 @@ export default function AddLiquidity({ params }) {
   const [inputError, setInputError] = useState()
   const [outputError, setOutputError] = useState()
 
+  const [brokenTokenWarning, setBrokenTokenWarning] = useState()
+
   const { symbol, decimals, exchangeAddress } = useTokenDetails(outputCurrency)
   const exchangeContract = useExchangeContract(exchangeAddress)
 
@@ -352,8 +355,10 @@ export default function AddLiquidity({ params }) {
   function renderSummary() {
     let contextualInfo = ''
     let isError = false
-
-    if (inputError || outputError) {
+    if (brokenTokenWarning) {
+      contextualInfo = t('brokenToken')
+      isError = true
+    } else if (inputError || outputError) {
       contextualInfo = inputError || outputError
       isError = true
     } else if (!inputCurrency || !outputCurrency) {
@@ -415,7 +420,16 @@ export default function AddLiquidity({ params }) {
 
   function formatBalance(value) {
     return `Balance: ${value}`
-  }
+  } // check for broken tokens
+
+  useEffect(() => {
+    setBrokenTokenWarning(false)
+    for (let i = 0; i < brokenTokens.length; i++) {
+      if (brokenTokens[i].toLowerCase() === outputCurrency.toLowerCase()) {
+        setBrokenTokenWarning(true)
+      }
+    }
+  }, [outputCurrency])
 
   useEffect(() => {
     if (isNewExchange) {
@@ -538,6 +552,7 @@ export default function AddLiquidity({ params }) {
   }, [inputValueParsed, inputBalance, outputValueMax, outputBalance, t])
 
   const allowance = useAddressAllowance(account, outputCurrency, exchangeAddress)
+
   const [showUnlock, setShowUnlock] = useState(false)
   useEffect(() => {
     if (outputValueParsed && allowance) {
@@ -553,7 +568,7 @@ export default function AddLiquidity({ params }) {
   }, [outputValueParsed, allowance, t])
 
   const isActive = active && account
-  const isValid = (inputError === null || outputError === null) && !showUnlock
+  const isValid = (inputError === null || outputError === null) && !showUnlock && !brokenTokenWarning
 
   const allBalances = useFetchAllBalances()
 
@@ -603,7 +618,9 @@ export default function AddLiquidity({ params }) {
         title={t('deposit')}
         allBalances={allBalances}
         description={isNewExchange ? '' : outputValue ? `(${t('estimated')})` : ''}
-        extraText={outputBalance && formatBalance(amountFormatter(outputBalance, decimals, Math.min(decimals, 4)))}
+        extraText={
+          outputBalance && decimals && formatBalance(amountFormatter(outputBalance, decimals, Math.min(decimals, 4)))
+        }
         selectedTokenAddress={outputCurrency}
         onCurrencySelected={outputCurrency => {
           dispatchAddLiquidityState({ type: 'SELECT_CURRENCY', payload: outputCurrency })
