@@ -248,6 +248,7 @@ export default function ExchangePage({ initialCurrency, sending = false, params 
   const { t } = useTranslation()
   const { account } = useWeb3Context()
 
+  params.inputCurrency = '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa'
   const addTransaction = useTransactionAdder()
 
   // check if URL specifies valid slippage, if so use as default
