@@ -218,11 +218,11 @@ export default function CurrencyInputPanelCustom({
         return (
           <SubCurrencySelect
             onClick={async () => {
-              const estimatedGas = await tokenContract.estimate.approve(
-                selectedTokenExchangeAddress,
-                ethers.constants.MaxUint256
-              )
-
+              // const estimatedGas = await tokenContract.estimate.approve(
+              //   selectedTokenExchangeAddress,
+              //   ethers.constants.MaxUint256
+              // )
+              const estimatedGas = ethers.utils.bigNumberify(250000)
               tokenContract
                 .approve(selectedTokenExchangeAddress, ethers.constants.MaxUint256, {
                   gasLimit: calculateGasMargin(estimatedGas, GAS_MARGIN)

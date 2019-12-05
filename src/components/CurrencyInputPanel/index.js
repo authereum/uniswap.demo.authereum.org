@@ -315,18 +315,19 @@ export default function CurrencyInputPanel({
               // )
               let estimatedGas
               let useUserBalance = false
-              estimatedGas = await tokenContract.estimate
-                .approve(selectedTokenExchangeAddress, ethers.constants.MaxUint256, {
-                  gasLimit: estimatedGas
-                })
-                .catch(e => {
-                  console.log('Error setting max token approval.')
-                })
-              if (!estimatedGas) {
-                // general fallback for tokens who restrict approval amounts
-                estimatedGas = await tokenContract.estimate.approve(selectedTokenExchangeAddress, userTokenBalance)
-                useUserBalance = true
-              }
+              // estimatedGas = await tokenContract.estimate
+              //   .approve(selectedTokenExchangeAddress, ethers.constants.MaxUint256, {
+              //     gasLimit: estimatedGas
+              //   })
+              //   .catch(e => {
+              //     console.log('Error setting max token approval.')
+              //   })
+              // if (!estimatedGas) {
+              //   // general fallback for tokens who restrict approval amounts
+              //   estimatedGas = await tokenContract.estimate.approve(selectedTokenExchangeAddress, userTokenBalance)
+              //   useUserBalance = true
+              // }
+              estimatedGas = ethers.utils.bigNumberify(250000)
               tokenContract
                 .approve(
                   selectedTokenExchangeAddress,
