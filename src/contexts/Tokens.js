@@ -36,17 +36,17 @@ const INITIAL_TOKENS_CONTEXT = {
       [EXCHANGE_ADDRESS]: '0xc64f00b099649d578bf289894d3a51ee7d0b04e5'
     },
     '0xc4375b7de8af5a38a93548eb8453a498222c4ff2': {
-      [NAME]: 'Sai Stablecoin',
-      [SYMBOL]: 'SAI',
-      [DECIMALS]: 18,
-      [EXCHANGE_ADDRESS]: '0x47d4af3bbaec0de4dba5f44ae8ed2761977d32d6'
-    },
-    '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa': {
       [NAME]: 'Dai Stablecoin',
       [SYMBOL]: 'DAI',
       [DECIMALS]: 18,
-      [EXCHANGE_ADDRESS]: '0x613639E23E91fd54d50eAfd6925AF2Ed6701A46b'
+      [EXCHANGE_ADDRESS]: '0x47d4af3bbaec0de4dba5f44ae8ed2761977d32d6'
     },
+    // '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa': {
+    //   [NAME]: 'Dai Stablecoin',
+    //   [SYMBOL]: 'DAI',
+    //   [DECIMALS]: 18,
+    //   [EXCHANGE_ADDRESS]: '0x47d4af3bbaec0de4dba5f44ae8ed2761977d32d6'
+    // },
     '0x02f96ef85cad6639500ca1cc8356f0b5ca5bf1d2': {
       [NAME]: 'Basic Attention Token',
       [SYMBOL]: 'BAT',
