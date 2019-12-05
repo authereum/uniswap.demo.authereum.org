@@ -3,7 +3,8 @@ import { Authereum } from 'authereum'
 import Web3 from 'web3'
 const { Connector, ErrorCodeMixin } = Connectors
 
-const network = process.env.REACT_APP_NETWORK
+// const network = process.env.REACT_APP_NETWORK
+const network = 'kovan'
 let enabled = false
 
 const checkWeb3 = async () => {
