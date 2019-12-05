@@ -125,16 +125,8 @@ function getInitialSwapState(state) {
     independentValue: state.exactFieldURL && state.exactAmountURL ? state.exactAmountURL : '', // this is a user input
     dependentValue: '', // this is a calculated number
     independentField: state.exactFieldURL === 'output' ? OUTPUT : INPUT,
-    inputCurrency: state.inputCurrencyURL ? state.inputCurrencyURL : 'ETH',
-    outputCurrency: state.outputCurrencyURL
-      ? state.outputCurrencyURL === 'ETH'
-        ? state.inputCurrencyURL && state.inputCurrencyURL !== 'ETH'
-          ? 'ETH'
-          : ''
-        : state.outputCurrencyURL
-      : state.initialCurrency
-      ? state.initialCurrency
-      : ''
+    inputCurrency: '0xc4375b7de8af5a38a93548eb8453a498222c4ff2',
+    outputCurrency: 'ETH'
   }
 }
 
@@ -248,8 +240,6 @@ export default function ExchangePage({ initialCurrency, sending = false, params 
   const { t } = useTranslation()
   const { account } = useWeb3Context()
 
-  // console.log(params)
-  // params.inputCurrency = '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa'
   const addTransaction = useTransactionAdder()
 
   // check if URL specifies valid slippage, if so use as default
