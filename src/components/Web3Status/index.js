@@ -5,7 +5,7 @@ import { useWeb3Context, Connectors } from 'web3-react'
 import { darken, transparentize } from 'polished'
 import Jazzicon from 'jazzicon'
 import { ethers } from 'ethers'
-import { Activity, ArrowRight } from 'react-feather'
+import { Activity } from 'react-feather'
 
 import { shortenAddress } from '../../utils'
 import { useENSName } from '../../hooks'
@@ -44,8 +44,8 @@ const LogoutText = styled.div`
 
 const Web3StatusError = styled(Web3StatusGeneric)`
   background-color: ${({ theme }) => theme.salmonRed};
-  color: ${({ theme }) => theme.white};
   border: 1px solid ${({ theme }) => theme.salmonRed};
+  color: ${({ theme }) => theme.white};
   font-weight: 500;
   :hover,
   :focus {
@@ -55,9 +55,10 @@ const Web3StatusError = styled(Web3StatusGeneric)`
 
 const Web3StatusConnect = styled(Web3StatusGeneric)`
   background-color: ${({ theme }) => theme.royalBlue};
-  color: ${({ theme }) => theme.white};
   border: 1px solid ${({ theme }) => theme.royalBlue};
+  color: ${({ theme }) => theme.white};
   font-weight: 500;
+
   :hover,
   :focus {
     background-color: ${({ theme }) => darken(0.1, theme.royalBlue)};
@@ -65,14 +66,18 @@ const Web3StatusConnect = styled(Web3StatusGeneric)`
 `
 
 const Web3StatusConnected = styled(Web3StatusGeneric)`
-  background-color: ${({ pending, theme }) => (pending ? theme.zumthorBlue : theme.white)};
-  color: ${({ pending, theme }) => (pending ? theme.royalBlue : theme.doveGray)};
+  background-color: ${({ pending, theme }) => (pending ? theme.zumthorBlue : theme.inputBackground)};
   border: 1px solid ${({ pending, theme }) => (pending ? theme.royalBlue : theme.mercuryGray)};
+  color: ${({ pending, theme }) => (pending ? theme.royalBlue : theme.doveGray)};
   font-weight: 400;
   :hover {
+
+    /* > P {
+      color: ${({ theme }) => theme.uniswapPink};
+    } */
     background-color: ${({ pending, theme }) =>
-      pending ? transparentize(0.9, theme.royalBlue) : transparentize(0.9, theme.mercuryGray)};
-  }
+      pending ? transparentize(0.9, theme.royalBlue) : darken(0.05, theme.inputBackground)};
+    
   :focus {
     border: 1px solid
       ${({ pending, theme }) => (pending ? darken(0.1, theme.royalBlue) : darken(0.1, theme.mercuryGray))};
@@ -84,7 +89,6 @@ const Text = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-
   margin: 0 0.5rem 0 0.25rem;
   font-size: 0.83rem;
 `
@@ -97,13 +101,6 @@ const Identicon = styled.div`
 `
 
 const NetworkIcon = styled(Activity)`
-  margin-left: 0.25rem;
-  margin-right: 0.5rem;
-  width: 16px;
-  height: 16px;
-`
-
-const ArrowIcon = styled(ArrowRight)`
   margin-left: 0.25rem;
   margin-right: 0.5rem;
   width: 16px;
@@ -267,7 +264,6 @@ export default function Web3Status() {
       return (
         <Web3StatusConnect onClick={onClick}>
           <Text>{t('Connect')}</Text>
-          <ArrowIcon />
         </Web3StatusConnect>
       )
     } else {

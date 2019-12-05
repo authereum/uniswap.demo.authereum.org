@@ -53,31 +53,28 @@ export function useBodyKeyDown(targetKey, onKeyDown, suppressOnKeyDown = false) 
 export function useENSName(address) {
   const { library } = useWeb3Context()
 
-  const [ENSName, setENSNname] = useState()
+  const [ENSName, setENSName] = useState()
 
   useEffect(() => {
     if (isAddress(address)) {
       let stale = false
-      library
-        .lookupAddress(address)
-        .then(name => {
+      try {
+        library.lookupAddress(address).then(name => {
           if (!stale) {
             if (name) {
-              setENSNname(name)
+              setENSName(name)
             } else {
-              setENSNname(null)
+              setENSName(null)
             }
           }
         })
-        .catch(() => {
-          if (!stale) {
-            setENSNname(null)
-          }
-        })
+      } catch {
+        setENSName(null)
+      }
 
       return () => {
         stale = true
-        setENSNname()
+        setENSName()
       }
     }
   }, [library, address])

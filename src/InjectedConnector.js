@@ -1,5 +1,5 @@
 import { Connectors } from 'web3-react'
-import Authereum from 'authereum'
+import { Authereum } from 'authereum'
 import Web3 from 'web3'
 const { Connector, ErrorCodeMixin } = Connectors
 
@@ -20,7 +20,6 @@ const checkWeb3 = async () => {
 
     const authereum = new Authereum(network)
     const provider = authereum.getProvider()
-
     window.ethereum = provider
     window.web3 = new Web3(provider)
 
