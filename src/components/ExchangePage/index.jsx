@@ -125,7 +125,7 @@ function getInitialSwapState(state) {
     independentValue: state.exactFieldURL && state.exactAmountURL ? state.exactAmountURL : '', // this is a user input
     dependentValue: '', // this is a calculated number
     independentField: state.exactFieldURL === 'output' ? OUTPUT : INPUT,
-    inputCurrency: '0xc4375b7de8af5a38a93548eb8453a498222c4ff2',
+    inputCurrency: '0x7d669A64deb8a4A51eEa755bb0E19FD39CE25Ae9',
     outputCurrency: 'ETH'
   }
 }
