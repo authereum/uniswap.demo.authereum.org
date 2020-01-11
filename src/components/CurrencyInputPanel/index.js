@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ethers } from 'ethers'
 import { BigNumber } from '@uniswap/sdk'
-import { useWeb3Context } from 'web3-react'
 import styled from 'styled-components'
 import escapeStringRegex from 'escape-string-regexp'
 import { darken } from 'polished'
@@ -12,7 +11,7 @@ import '@reach/tooltip/styles.css'
 import { isMobile } from 'react-device-detect'
 
 import { BorderlessInput } from '../../theme'
-import { useTokenContract } from '../../hooks'
+import { useWeb3React, useTokenContract } from '../../hooks'
 import { isAddress, calculateGasMargin, formatToUsd, formatTokenBalance, formatEthBalance } from '../../utils'
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 import Modal from '../Modal'
@@ -25,7 +24,7 @@ import { ReactComponent as Close } from '../../assets/images/x.svg'
 import { transparentize } from 'polished'
 import { Spinner } from '../../theme'
 import Circle from '../../assets/images/circle-grey.svg'
-import { useUSDPrice } from '../../contexts/Application'
+import { useETHPriceInUSD, useAllBalances } from '../../contexts/Balances'
 
 const GAS_MARGIN = ethers.utils.bigNumberify(1000)
 
@@ -225,7 +224,10 @@ const TokenModalRow = styled.div`
     background-color: ${({ theme }) => theme.tokenRowHover};
   }
 
-  ${({ theme }) => theme.mediaWidth.upToMedium`padding: 0.8rem 1rem;`}
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    padding: 0.8rem 1rem;
+    padding-right: 2rem;
+  `}
 `
 
 const TokenRowLeft = styled.div`
@@ -297,7 +299,7 @@ export default function CurrencyInputPanel({
 
   const allTokens = useAllTokenDetails()
 
-  const { account } = useWeb3Context()
+  const { account } = useWeb3React()
 
   const userTokenBalance = useAddressBalance(account, selectedTokenAddress)
 
@@ -309,16 +311,10 @@ export default function CurrencyInputPanel({
         return (
           <SubCurrencySelect
             onClick={async () => {
-              // const estimatedGas = await tokenContract.estimate.approve(
-              //   selectedTokenExchangeAddress,
-              //   ethers.constants.MaxUint256
-              // )
               let estimatedGas
               let useUserBalance = false
               estimatedGas = await tokenContract.estimate
-                .approve(selectedTokenExchangeAddress, ethers.constants.MaxUint256, {
-                  gasLimit: estimatedGas
-                })
+                .approve(selectedTokenExchangeAddress, ethers.constants.MaxUint256)
                 .catch(e => {
                   console.log('Error setting max token approval.')
                 })
@@ -432,7 +428,6 @@ export default function CurrencyInputPanel({
       {!disableTokenSelect && (
         <CurrencySelectModal
           isOpen={modalIsOpen}
-          // isOpen={true}
           onDismiss={() => {
             setModalIsOpen(false)
           }}
@@ -444,7 +439,7 @@ export default function CurrencyInputPanel({
   )
 }
 
-function CurrencySelectModal({ isOpen, onDismiss, onTokenSelect, allBalances }) {
+function CurrencySelectModal({ isOpen, onDismiss, onTokenSelect }) {
   const { t } = useTranslation()
 
   const [searchQuery, setSearchQuery] = useState('')
@@ -452,22 +447,33 @@ function CurrencySelectModal({ isOpen, onDismiss, onTokenSelect, allBalances }) 
 
   const allTokens = useAllTokenDetails()
 
-  const { account } = useWeb3Context()
+  const { account } = useWeb3React()
 
   // BigNumber.js instance
-  const ethPrice = useUSDPrice()
+  const ethPrice = useETHPriceInUSD()
+
+  // all balances for both account and exchanges
+  let allBalances = useAllBalances()
 
   const _usdAmounts = Object.keys(allTokens).map(k => {
-    if (
-      ethPrice &&
-      allBalances &&
-      allBalances[k] &&
-      allBalances[k].ethRate &&
-      !allBalances[k].ethRate.isNaN() &&
-      allBalances[k].balance
-    ) {
-      const USDRate = ethPrice.times(allBalances[k].ethRate)
-      const balanceBigNumber = new BigNumber(allBalances[k].balance.toString())
+    if (ethPrice && allBalances[account] && allBalances[account][k] && allBalances[account][k].value) {
+      let ethRate = 1 // default for ETH
+      let exchangeDetails = allBalances[allTokens[k].exchangeAddress]
+      if (
+        exchangeDetails &&
+        exchangeDetails[k] &&
+        exchangeDetails[k].value &&
+        exchangeDetails['ETH'] &&
+        exchangeDetails['ETH'].value
+      ) {
+        const tokenBalance = new BigNumber(exchangeDetails[k].value.toString())
+        const ethBalance = new BigNumber(exchangeDetails['ETH'].value.toString())
+        ethRate = ethBalance.div(tokenBalance)
+      }
+      const USDRate = ethPrice
+        .times(ethRate)
+        .times(new BigNumber(10).pow(allTokens[k].decimals).div(new BigNumber(10).pow(18)))
+      const balanceBigNumber = new BigNumber(allBalances[account][k].value.toString())
       const usdBalance = balanceBigNumber.times(USDRate).div(new BigNumber(10).pow(allTokens[k].decimals))
       return usdBalance
     } else {
@@ -484,38 +490,45 @@ function CurrencySelectModal({ isOpen, onDismiss, onTokenSelect, allBalances }) 
   const tokenList = useMemo(() => {
     return Object.keys(allTokens)
       .sort((a, b) => {
-        const aSymbol = allTokens[a].symbol.toLowerCase()
-        const bSymbol = allTokens[b].symbol.toLowerCase()
+        if (allTokens[a].symbol && allTokens[b].symbol) {
+          const aSymbol = allTokens[a].symbol.toLowerCase()
+          const bSymbol = allTokens[b].symbol.toLowerCase()
 
-        if (aSymbol === 'ETH'.toLowerCase() || bSymbol === 'ETH'.toLowerCase()) {
-          return aSymbol === bSymbol ? 0 : aSymbol === 'ETH'.toLowerCase() ? -1 : 1
+          // pin ETH to top
+          if (aSymbol === 'ETH'.toLowerCase() || bSymbol === 'ETH'.toLowerCase()) {
+            return aSymbol === bSymbol ? 0 : aSymbol === 'ETH'.toLowerCase() ? -1 : 1
+          }
+
+          // then tokens with balance
+          if (usdAmounts[a] && !usdAmounts[b]) {
+            return -1
+          } else if (usdAmounts[b] && !usdAmounts[a]) {
+            return 1
+          }
+
+          // sort by balance
+          if (usdAmounts[a] && usdAmounts[b]) {
+            const aUSD = usdAmounts[a]
+            const bUSD = usdAmounts[b]
+
+            return aUSD.gt(bUSD) ? -1 : aUSD.lt(bUSD) ? 1 : 0
+          }
+
+          // sort alphabetically
+          return aSymbol < bSymbol ? -1 : aSymbol > bSymbol ? 1 : 0
+        } else {
+          return 0
         }
-
-        if (usdAmounts[a] && !usdAmounts[b]) {
-          return -1
-        } else if (usdAmounts[b] && !usdAmounts[a]) {
-          return 1
-        }
-
-        // check for balance - sort by value
-        if (usdAmounts[a] && usdAmounts[b]) {
-          const aUSD = usdAmounts[a]
-          const bUSD = usdAmounts[b]
-
-          return aUSD.gt(bUSD) ? -1 : aUSD.lt(bUSD) ? 1 : 0
-        }
-
-        return aSymbol < bSymbol ? -1 : aSymbol > bSymbol ? 1 : 0
       })
       .map(k => {
         let balance
         let usdBalance
         // only update if we have data
-        if (k === 'ETH' && allBalances && allBalances[k]) {
-          balance = formatEthBalance(allBalances[k].balance)
+        if (k === 'ETH' && allBalances[account] && allBalances[account][k] && allBalances[account][k].value) {
+          balance = formatEthBalance(allBalances[account][k].value)
           usdBalance = usdAmounts[k]
-        } else if (allBalances && allBalances[k]) {
-          balance = formatTokenBalance(allBalances[k].balance, allTokens[k].decimals)
+        } else if (allBalances[account] && allBalances[account][k] && allBalances[account][k].value) {
+          balance = formatTokenBalance(allBalances[account][k].value, allTokens[k].decimals)
           usdBalance = usdAmounts[k]
         }
         return {
@@ -526,7 +539,7 @@ function CurrencySelectModal({ isOpen, onDismiss, onTokenSelect, allBalances }) 
           usdBalance: usdBalance
         }
       })
-  }, [allBalances, allTokens, usdAmounts])
+  }, [allBalances, allTokens, usdAmounts, account])
 
   const filteredTokenList = useMemo(() => {
     return tokenList.filter(tokenEntry => {
@@ -585,7 +598,13 @@ function CurrencySelectModal({ isOpen, onDismiss, onTokenSelect, allBalances }) 
               '-'
             )}
             <TokenRowUsd>
-              {usdBalance ? (usdBalance.lt(0.01) ? '<$0.01' : '$' + formatToUsd(usdBalance)) : ''}
+              {usdBalance && !usdBalance.isNaN()
+                ? usdBalance.isZero()
+                  ? ''
+                  : usdBalance.lt(0.01)
+                  ? '<$0.01'
+                  : '$' + formatToUsd(usdBalance)
+                : ''}
             </TokenRowUsd>
           </TokenRowRight>
         </TokenModalRow>
@@ -612,6 +631,7 @@ function CurrencySelectModal({ isOpen, onDismiss, onTokenSelect, allBalances }) 
       isOpen={isOpen}
       onDismiss={clearInputAndDismiss}
       minHeight={60}
+      maxHeight={50}
       initialFocusRef={isMobile ? undefined : inputRef}
     >
       <TokenModal>

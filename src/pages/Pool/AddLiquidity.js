@@ -1,6 +1,5 @@
 import React, { useReducer, useState, useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useWeb3Context } from 'web3-react'
 import { createBrowserHistory } from 'history'
 import { ethers } from 'ethers'
 import ReactGA from 'react-ga'
@@ -11,14 +10,12 @@ import CurrencyInputPanel from '../../components/CurrencyInputPanel'
 import OversizedPanel from '../../components/OversizedPanel'
 import ContextualInfo from '../../components/ContextualInfo'
 import { ReactComponent as Plus } from '../../assets/images/plus-blue.svg'
-
-import { useExchangeContract } from '../../hooks'
+import { useWeb3React, useExchangeContract } from '../../hooks'
 import { brokenTokens } from '../../constants'
 import { amountFormatter, calculateGasMargin } from '../../utils'
 import { useTransactionAdder } from '../../contexts/Transactions'
 import { useTokenDetails } from '../../contexts/Tokens'
-import { useFetchAllBalances } from '../../contexts/AllBalances'
-import { useAddressBalance, useExchangeReserves } from '../../contexts/Balances'
+import { useAddressBalance, useExchangeReserves, useETHPriceInUSD } from '../../contexts/Balances'
 import { useAddressAllowance } from '../../contexts/Allowances'
 
 const INPUT = 0
@@ -201,7 +198,10 @@ function getMarketRate(reserveETH, reserveToken, decimals, invert = false) {
 
 export default function AddLiquidity({ params }) {
   const { t } = useTranslation()
-  const { library, active, account } = useWeb3Context()
+  const { library, account, active } = useWeb3React()
+
+  // BigNumber.js instance
+  const ethPrice = useETHPriceInUSD()
 
   // clear url of query
   useEffect(() => {
@@ -299,11 +299,6 @@ export default function AddLiquidity({ params }) {
   }, [reserveETH, reserveToken, decimals])
 
   function renderTransactionDetails() {
-    ReactGA.event({
-      category: 'TransactionDetail',
-      action: 'Open'
-    })
-
     const b = text => <BlueSpan>{text}</BlueSpan>
 
     if (isNewExchange) {
@@ -384,22 +379,27 @@ export default function AddLiquidity({ params }) {
   const addTransaction = useTransactionAdder()
 
   async function onAddLiquidity() {
+    // take ETH amount, multiplied by ETH rate and 2 for total tx size
+    let usdTransactionSize = ethPrice * (inputValueParsed / 1e18) * 2
+
+    // log pool added to and total usd amount
     ReactGA.event({
-      category: 'Pool',
-      action: 'AddLiquidity'
+      category: 'Transaction',
+      action: 'Add Liquidity',
+      label: outputCurrency,
+      value: usdTransactionSize
     })
 
     const deadline = Math.ceil(Date.now() / 1000) + DEADLINE_FROM_NOW
 
-    // const estimatedGasLimit = await exchangeContract.estimate.addLiquidity(
-    //   isNewExchange ? ethers.constants.Zero : liquidityTokensMin,
-    //   isNewExchange ? outputValueParsed : outputValueMax,
-    //   deadline,
-    //   {
-    //     value: inputValueParsed
-    //   }
-    // )
-    const estimatedGasLimit = ethers.utils.bigNumberify(250000)
+    const estimatedGasLimit = await exchangeContract.estimate.addLiquidity(
+      isNewExchange ? ethers.constants.Zero : liquidityTokensMin,
+      isNewExchange ? outputValueParsed : outputValueMax,
+      deadline,
+      {
+        value: inputValueParsed
+      }
+    )
 
     const gasLimit = calculateGasMargin(estimatedGasLimit, GAS_MARGIN)
 
@@ -570,8 +570,6 @@ export default function AddLiquidity({ params }) {
   const isActive = active && account
   const isValid = (inputError === null || outputError === null) && !showUnlock && !brokenTokenWarning
 
-  const allBalances = useFetchAllBalances()
-
   return (
     <>
       {isNewExchange ? (
@@ -588,7 +586,6 @@ export default function AddLiquidity({ params }) {
 
       <CurrencyInputPanel
         title={t('deposit')}
-        allBalances={allBalances}
         extraText={inputBalance && formatBalance(amountFormatter(inputBalance, 18, 4))}
         onValueChange={inputValue => {
           dispatchAddLiquidityState({ type: 'UPDATE_VALUE', payload: { value: inputValue, field: INPUT } })
@@ -616,7 +613,6 @@ export default function AddLiquidity({ params }) {
       </OversizedPanel>
       <CurrencyInputPanel
         title={t('deposit')}
-        allBalances={allBalances}
         description={isNewExchange ? '' : outputValue ? `(${t('estimated')})` : ''}
         extraText={
           outputBalance && decimals && formatBalance(amountFormatter(outputBalance, decimals, Math.min(decimals, 4)))

@@ -2,21 +2,18 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import ReactGA from 'react-ga'
 import { createBrowserHistory } from 'history'
-import { useWeb3Context } from 'web3-react'
 import { ethers } from 'ethers'
 import styled from 'styled-components'
 
+import { useWeb3React, useExchangeContract } from '../../hooks'
 import { Button } from '../../theme'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
 import ContextualInfo from '../../components/ContextualInfo'
 import OversizedPanel from '../../components/OversizedPanel'
 import ArrowDown from '../../assets/svg/SVGArrowDown'
-
-import { useExchangeContract } from '../../hooks'
 import { useTransactionAdder } from '../../contexts/Transactions'
 import { useTokenDetails } from '../../contexts/Tokens'
-import { useAddressBalance } from '../../contexts/Balances'
-import { useFetchAllBalances } from '../../contexts/AllBalances'
+import { useAddressBalance, useETHPriceInUSD } from '../../contexts/Balances'
 import { calculateGasMargin, amountFormatter } from '../../utils'
 
 // denominated in bips
@@ -143,8 +140,8 @@ function calculateSlippageBounds(value) {
 }
 
 export default function RemoveLiquidity({ params }) {
-  const { library, account, active } = useWeb3Context()
   const { t } = useTranslation()
+  const { library, account, active } = useWeb3React()
 
   const addTransaction = useTransactionAdder()
 
@@ -247,21 +244,27 @@ export default function RemoveLiquidity({ params }) {
     }
   }, [fetchPoolTokens, library])
 
+  // BigNumber.js instance
+  const ethPrice = useETHPriceInUSD()
+
   async function onRemoveLiquidity() {
+    // take ETH amount, multiplied by ETH rate and 2 for total tx size
+    let usdTransactionSize = ethPrice * (ethWithdrawn / 1e18) * 2
     ReactGA.event({
-      category: 'Pool',
-      action: 'RemoveLiquidity'
+      category: 'Transaction',
+      action: 'Remove Liquidity',
+      label: outputCurrency,
+      value: usdTransactionSize
     })
 
     const deadline = Math.ceil(Date.now() / 1000) + DEADLINE_FROM_NOW
 
-    // const estimatedGasLimit = await exchange.estimate.removeLiquidity(
-    //   valueParsed,
-    //   ethWithdrawnMin,
-    //   tokenWithdrawnMin,
-    //   deadline
-    // )
-    const estimatedGasLimit = ethers.utils.bigNumberify(250000)
+    const estimatedGasLimit = await exchange.estimate.removeLiquidity(
+      valueParsed,
+      ethWithdrawnMin,
+      tokenWithdrawnMin,
+      deadline
+    )
 
     exchange
       .removeLiquidity(valueParsed, ethWithdrawnMin, tokenWithdrawnMin, deadline, {
@@ -275,11 +278,6 @@ export default function RemoveLiquidity({ params }) {
   const b = text => <BlueSpan>{text}</BlueSpan>
 
   function renderTransactionDetails() {
-    ReactGA.event({
-      category: 'TransactionDetail',
-      action: 'Open'
-    })
-
     return (
       <div>
         <div>
@@ -337,13 +335,10 @@ export default function RemoveLiquidity({ params }) {
 
   const marketRate = getMarketRate(exchangeETHBalance, exchangeTokenBalance, decimals)
 
-  const allBalances = useFetchAllBalances()
-
   return (
     <>
       <CurrencyInputPanel
         title={t('poolTokens')}
-        allBalances={allBalances}
         extraText={poolTokenBalance && formatBalance(amountFormatter(poolTokenBalance, 18, 4))}
         extraTextClickHander={() => {
           if (poolTokenBalance) {
@@ -366,7 +361,6 @@ export default function RemoveLiquidity({ params }) {
       </OversizedPanel>
       <CurrencyInputPanel
         title={t('output')}
-        allBalances={allBalances}
         description={!!(ethWithdrawn && tokenWithdrawn) ? `(${t('estimated')})` : ''}
         key="remove-liquidity-input"
         renderInput={() =>

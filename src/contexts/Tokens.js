@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
-import { useWeb3Context } from 'web3-react'
-import { ethers } from 'ethers'
 
+import { useWeb3React } from '../hooks'
 import {
   isAddress,
   getTokenName,
@@ -28,51 +27,13 @@ const ETH = {
 }
 
 const INITIAL_TOKENS_CONTEXT = {
-  42: {
-    '0xac94ea989f6955c67200dd67f0101e1865a560ea': {
-      [NAME]: 'Maker',
-      [SYMBOL]: 'MKR',
-      [DECIMALS]: 18,
-      [EXCHANGE_ADDRESS]: '0xc64f00b099649d578bf289894d3a51ee7d0b04e5'
-    },
-    '0xc4375b7de8af5a38a93548eb8453a498222c4ff2': {
-      [NAME]: 'Dai Stablecoin v1.0',
-      [SYMBOL]: 'DAI',
-      [DECIMALS]: 18,
-      [EXCHANGE_ADDRESS]: '0x47d4af3bbaec0de4dba5f44ae8ed2761977d32d6'
-    },
-    '0x02f96ef85cad6639500ca1cc8356f0b5ca5bf1d2': {
-      [NAME]: 'Basic Attention Token',
-      [SYMBOL]: 'BAT',
-      [DECIMALS]: 18,
-      [EXCHANGE_ADDRESS]: '0x2f177704b7ceb1fa56c8956479f321b56ad9e3b4'
-    },
-    // '0x3fa9fcd9456991fe1220d1bb77a5863695c01c05': {
-    //   [NAME]: 'Omise Go',
-    //   [SYMBOL]: 'OMG',
-    //   [DECIMALS]: 18,
-    //   [EXCHANGE_ADDRESS]: '0x2f177704b7ceb1fa56c8956479f321b56ad9e3b4'
-    // },
-    // '0x4c7493b70f16bec1e087bf74a31d095f9b8f9c40': {
-    //   [NAME]: 'Reputation',
-    //   [SYMBOL]: 'REP',
-    //   [DECIMALS]: 18,
-    //   [EXCHANGE_ADDRESS]: '0x4ca9baaffcc2692db2b33ab2ab2edda86c2c4a4d'
-    // },
-    '0xf8720eb6ad4a530cccb696043a0d10831e2ff60e': {
-      [NAME]: 'Civic',
-      [SYMBOL]: 'CVC',
-      [DECIMALS]: 18,
-      [EXCHANGE_ADDRESS]: '0x0ca5508612ca567dcb9caf02abc7f894fd4b7d82'
-    },
-    '0x4bb57bc8485ec4c4112aa25da4e746f373ad540e': {
-      [NAME]: 'Golem Network Token',
-      [SYMBOL]: 'GNT',
-      [DECIMALS]: 18,
-      [EXCHANGE_ADDRESS]: '0x7ca1bec492374463705103dda25cb1c41dcf8caa'
-    },
-  },
   1: {
+    '0xB6eD7644C69416d67B522e20bC294A9a9B405B31': {
+      [NAME]: '0xBitcoin Token',
+      [SYMBOL]: '0xBTC',
+      [DECIMALS]: 8,
+      [EXCHANGE_ADDRESS]: '0x701564Aa6E26816147D4fa211a0779F1B774Bb9B'
+    },
     '0x737F98AC8cA59f2C68aD658E3C3d8C8963E40a4c': {
       [NAME]: 'Amon',
       [SYMBOL]: 'AMN',
@@ -117,9 +78,15 @@ const INITIAL_TOKENS_CONTEXT = {
     },
     '0xF5DCe57282A584D2746FaF1593d3121Fcac444dC': {
       [NAME]: 'Compound Dai',
-      [SYMBOL]: 'cDAI',
+      [SYMBOL]: 'cSAI',
       [DECIMALS]: 8,
       [EXCHANGE_ADDRESS]: '0x45A2FDfED7F7a2c791fb1bdF6075b83faD821ddE'
+    },
+    '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643': {
+      [NAME]: 'Compound Dai',
+      [SYMBOL]: 'cDAI',
+      [DECIMALS]: 8,
+      [EXCHANGE_ADDRESS]: '0x34E89740adF97C3A9D3f63Cc2cE4a914382c230b'
     },
     '0x06AF07097C9Eeb7fD685c692751D5C66dB49c215': {
       [NAME]: 'Chai',
@@ -138,6 +105,12 @@ const INITIAL_TOKENS_CONTEXT = {
       [SYMBOL]: 'SAI',
       [DECIMALS]: 18,
       [EXCHANGE_ADDRESS]: '0x09cabEC1eAd1c0Ba254B09efb3EE13841712bE14'
+    },
+    '0x6B175474E89094C44Da98b954EedeAC495271d0F': {
+      [NAME]: 'Dai Stablecoin',
+      [SYMBOL]: 'DAI',
+      [DECIMALS]: 18,
+      [EXCHANGE_ADDRESS]: '0x2a1530C4C41db0B0b2bB646CB5Eb1A67b7158667'
     },
     '0x0Cf0Ee63788A0849fE5297F3407f701E122cC023': {
       [NAME]: 'Streamr DATAcoin',
@@ -169,6 +142,12 @@ const INITIAL_TOKENS_CONTEXT = {
       [DECIMALS]: 18,
       [EXCHANGE_ADDRESS]: '0xb99A23b1a4585fc56d0EC3B76528C27cAd427473'
     },
+    '0x06f65b8CfCb13a9FE37d836fE9708dA38Ecb29B2': {
+      [NAME]: 'SAINT FAME: Genesis Shirt',
+      [SYMBOL]: 'FAME',
+      [DECIMALS]: 18,
+      [EXCHANGE_ADDRESS]: '0x5e7907aC70b9a781365c72F2acEE96710bdA042e'
+    },
     '0x4946Fcea7C692606e8908002e55A582af44AC121': {
       [NAME]: 'FOAM Token',
       [SYMBOL]: 'FOAM',
@@ -199,11 +178,23 @@ const INITIAL_TOKENS_CONTEXT = {
       [DECIMALS]: 12,
       [EXCHANGE_ADDRESS]: '0x4B17685b330307C751B47f33890c8398dF4Fe407'
     },
+    '0x0000000000b3F879cb30FE243b4Dfee438691c04': {
+      [NAME]: 'Gastoken.io',
+      [SYMBOL]: 'GST2',
+      [DECIMALS]: 2,
+      [EXCHANGE_ADDRESS]: '0x929507CD3D90Ab11eC4822E9eB5A48eb3a178F19'
+    },
     '0x14094949152EDDBFcd073717200DA82fEd8dC960': {
       [NAME]: 'bZx DAI iToken ',
       [SYMBOL]: 'iDAI',
       [DECIMALS]: 18,
       [EXCHANGE_ADDRESS]: '0x81eeD7F1EcbD7FA9978fcc7584296Fb0C215Dc5C'
+    },
+    '0x3212b29E33587A00FB1C83346f5dBFA69A458923': {
+      [NAME]: 'The Tokenized Bitcoin',
+      [SYMBOL]: 'imBTC',
+      [DECIMALS]: 8,
+      [EXCHANGE_ADDRESS]: '0xFFcf45b540e6C9F094Ae656D2e34aD11cdfdb187'
     },
     '0x6fB3e0A217407EFFf7Ca062D46c26E5d60a14d69': {
       [NAME]: 'IoTeX Network',
@@ -319,6 +310,12 @@ const INITIAL_TOKENS_CONTEXT = {
       [DECIMALS]: 18,
       [EXCHANGE_ADDRESS]: '0x2Bf5A5bA29E60682fC56B2Fcf9cE07Bef4F6196f'
     },
+    '0x4575f41308EC1483f3d399aa9a2826d74Da13Deb': {
+      [NAME]: 'Orchid',
+      [SYMBOL]: 'OXT',
+      [DECIMALS]: 18,
+      [EXCHANGE_ADDRESS]: '0xe9a5bbe41dc63D555E06746b047d624E3343EA52'
+    },
     '0xD56daC73A4d6766464b38ec6D91eB45Ce7457c44': {
       [NAME]: 'Panvala pan',
       [SYMBOL]: 'PAN',
@@ -330,6 +327,12 @@ const INITIAL_TOKENS_CONTEXT = {
       [SYMBOL]: 'PAX',
       [DECIMALS]: 18,
       [EXCHANGE_ADDRESS]: '0xC040d51b07Aea5d94a89Bc21E8078B77366Fc6C7'
+    },
+    '0x45804880De22913dAFE09f4980848ECE6EcbAf78': {
+      [NAME]: 'Paxos Gold',
+      [SYMBOL]: 'PAXG',
+      [DECIMALS]: 18,
+      [EXCHANGE_ADDRESS]: '0x0d2E1a84638bD1B6c0C260c758c39451D4587be1'
     },
     '0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d': {
       [NAME]: 'Pinakion',
@@ -378,12 +381,6 @@ const INITIAL_TOKENS_CONTEXT = {
       [SYMBOL]: 'REP',
       [DECIMALS]: 18,
       [EXCHANGE_ADDRESS]: '0x48B04d2A05B6B604d8d5223Fd1984f191DED51af'
-    },
-    '0x168296bb09e24A88805CB9c33356536B980D3fC5': {
-      [NAME]: 'RHOC',
-      [SYMBOL]: 'RHOC',
-      [DECIMALS]: 8,
-      [EXCHANGE_ADDRESS]: '0x394e524b47A3AB3D3327f7fF6629dC378c1494a3'
     },
     '0x9469D013805bFfB7D3DEBe5E7839237e535ec483': {
       [NAME]: 'Darwinia Network Native Token',
@@ -493,6 +490,18 @@ const INITIAL_TOKENS_CONTEXT = {
       [DECIMALS]: 8,
       [EXCHANGE_ADDRESS]: '0xb6cFBf322db47D39331E306005DC7E5e6549942B'
     },
+    '0xCb94be6f13A1182E4A4B6140cb7bf2025d28e41B': {
+      [NAME]: 'Trustcoin',
+      [SYMBOL]: 'TRST',
+      [DECIMALS]: 6,
+      [EXCHANGE_ADDRESS]: '0x95E4649F5209dD292cAF1F087b8F1Db3bE24927f'
+    },
+    '0x2C537E5624e4af88A7ae4060C022609376C8D0EB': {
+      [NAME]: 'BiLira',
+      [SYMBOL]: 'TRYB',
+      [DECIMALS]: 6,
+      [EXCHANGE_ADDRESS]: '0x122327Fd43B2C66DD9e4B6c91c8f071E217558eF'
+    },
     '0x0000000000085d4780B73119b644AE5ecd22b376': {
       [NAME]: 'TrueUSD',
       [SYMBOL]: 'TUSD',
@@ -510,6 +519,12 @@ const INITIAL_TOKENS_CONTEXT = {
       [SYMBOL]: 'USDC',
       [DECIMALS]: 6,
       [EXCHANGE_ADDRESS]: '0x97deC872013f6B5fB443861090ad931542878126'
+    },
+    '0xA4Bdb11dc0a2bEC88d24A3aa1E6Bb17201112eBe': {
+      [NAME]: 'StableUSD',
+      [SYMBOL]: 'USDS',
+      [DECIMALS]: 6,
+      [EXCHANGE_ADDRESS]: '0x7Ef7191AB91dDB4D7cC347fbFA170355acbaf02D'
     },
     '0x8f3470A7388c05eE4e7AF3d01D8C722b0FF52374': {
       [NAME]: 'Veritaseum',
@@ -541,17 +556,17 @@ const INITIAL_TOKENS_CONTEXT = {
       [DECIMALS]: 18,
       [EXCHANGE_ADDRESS]: '0x8dE0d002DC83478f479dC31F76cB0a8aa7CcEa17'
     },
+    '0x0f7F961648aE6Db43C75663aC7E5414Eb79b5704': {
+      [NAME]: 'XIO Network',
+      [SYMBOL]: 'XIO',
+      [DECIMALS]: 18,
+      [EXCHANGE_ADDRESS]: '0x7B6E5278a14d5318571d65aceD036d09c998C707'
+    },
     '0xE41d2489571d322189246DaFA5ebDe1F4699F498': {
       [NAME]: '0x Protocol Token',
       [SYMBOL]: 'ZRX',
       [DECIMALS]: 18,
       [EXCHANGE_ADDRESS]: '0xaE76c84C9262Cdb9abc0C2c8888e62Db8E22A0bF'
-    },
-    '0x6B175474E89094C44Da98b954EedeAC495271d0F': {
-      [NAME]: 'Dai Stablecoin',
-      [SYMBOL]: 'DAI',
-      [DECIMALS]: 18,
-      [EXCHANGE_ADDRESS]: '0x2a1530C4C41db0B0b2bB646CB5Eb1A67b7158667'
     }
   },
   4: {
@@ -608,10 +623,10 @@ export default function Provider({ children }) {
 }
 
 export function useTokenDetails(tokenAddress) {
-  const { networkId, library } = useWeb3Context()
+  const { library, chainId } = useWeb3React()
 
   const [state, { update }] = useTokensContext()
-  const allTokensInNetwork = { ...ETH, ...(safeAccess(state, [networkId]) || {}) }
+  const allTokensInNetwork = { ...ETH, ...(safeAccess(state, [chainId]) || {}) }
   const { [NAME]: name, [SYMBOL]: symbol, [DECIMALS]: decimals, [EXCHANGE_ADDRESS]: exchangeAddress } =
     safeAccess(allTokensInNetwork, [tokenAddress]) || {}
 
@@ -619,7 +634,7 @@ export function useTokenDetails(tokenAddress) {
     if (
       isAddress(tokenAddress) &&
       (name === undefined || symbol === undefined || decimals === undefined || exchangeAddress === undefined) &&
-      (networkId || networkId === 0) &&
+      (chainId || chainId === 0) &&
       library
     ) {
       let stale = false
@@ -627,14 +642,14 @@ export function useTokenDetails(tokenAddress) {
       const namePromise = getTokenName(tokenAddress, library).catch(() => null)
       const symbolPromise = getTokenSymbol(tokenAddress, library).catch(() => null)
       const decimalsPromise = getTokenDecimals(tokenAddress, library).catch(() => null)
-      const exchangeAddressPromise = getTokenExchangeAddressFromFactory(tokenAddress, networkId, library).catch(
+      const exchangeAddressPromise = getTokenExchangeAddressFromFactory(tokenAddress, chainId, library).catch(
         () => null
       )
 
       Promise.all([namePromise, symbolPromise, decimalsPromise, exchangeAddressPromise]).then(
         ([resolvedName, resolvedSymbol, resolvedDecimals, resolvedExchangeAddress]) => {
           if (!stale) {
-            update(networkId, tokenAddress, resolvedName, resolvedSymbol, resolvedDecimals, resolvedExchangeAddress)
+            update(chainId, tokenAddress, resolvedName, resolvedSymbol, resolvedDecimals, resolvedExchangeAddress)
           }
         }
       )
@@ -642,28 +657,15 @@ export function useTokenDetails(tokenAddress) {
         stale = true
       }
     }
-  }, [tokenAddress, name, symbol, decimals, exchangeAddress, networkId, library, update])
+  }, [tokenAddress, name, symbol, decimals, exchangeAddress, chainId, library, update])
 
   return { name, symbol, decimals, exchangeAddress }
 }
 
-export function useAllTokenDetails(requireExchange = true) {
-  const { networkId } = useWeb3Context()
+export function useAllTokenDetails() {
+  const { chainId } = useWeb3React()
 
   const [state] = useTokensContext()
-  const tokenDetails = { ...ETH, ...(safeAccess(state, [networkId]) || {}) }
 
-  return requireExchange
-    ? Object.keys(tokenDetails)
-        .filter(
-          tokenAddress =>
-            tokenAddress === 'ETH' ||
-            (safeAccess(tokenDetails, [tokenAddress, EXCHANGE_ADDRESS]) &&
-              safeAccess(tokenDetails, [tokenAddress, EXCHANGE_ADDRESS]) !== ethers.constants.AddressZero)
-        )
-        .reduce((accumulator, tokenAddress) => {
-          accumulator[tokenAddress] = tokenDetails[tokenAddress]
-          return accumulator
-        }, {})
-    : tokenDetails
+  return useMemo(() => ({ ...ETH, ...(safeAccess(state, [chainId]) || {}) }), [state, chainId])
 }

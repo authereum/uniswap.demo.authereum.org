@@ -29,10 +29,6 @@ const Nod = styled.span`
   }
 `
 
-const TitleContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`
 const Title = styled.div`
   display: flex;
   align-items: center;
@@ -54,14 +50,6 @@ const Title = styled.div`
       color: ${({ theme }) => darken(0.1, theme.wisteriaPurple)};
     }
   }
-`
-
-const Subtitle = styled.div`
-  display: flex;
-  align-items: center;
-  font-size: 0.5rem;
-  color: ${({ theme }) => theme.wisteriaPurple};
-  justify-content: flex-end;
 `
 
 export default function Header() {
